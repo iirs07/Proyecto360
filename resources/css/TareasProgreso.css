@@ -1,0 +1,207 @@
+/* ==== CONTENEDOR GENERAL ==== */
+.tareas-acordeon {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 0 12px; /* espacio lateral */
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  background-color: #ffffff; /* fondo sólido */
+  box-sizing: border-box;
+}
+
+/* ==== DESCRIPCIÓN DEL PROYECTO ==== */
+.proyecto-descripcion-contenedor {
+  width: 100%;
+  max-width: 1000px; /* se ajusta a pantallas grandes */
+  padding: 16px 20px;
+  margin: 30px auto 15px auto;
+  border-radius: 12px;
+  border-left: 8px solid #856404;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  font-size: 16px;
+  line-height: 1.5;
+  color: #000000;
+  background-color: #ffffff;
+  position: relative;
+  z-index: 1;
+
+  box-sizing: border-box;        /* importante para padding y width */
+  overflow: hidden;              /* evita que el contenido sobresalga */
+  transition: all 0.3s ease;     /* para hover suave */
+}
+
+
+/* Strong en la descripción */
+.proyecto-descripcion-contenedor strong {
+  display: block;
+  color: #856404;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+
+/* ==== TARJETA DE TAREA ==== */
+.tarea-item {
+  width: 100%;
+  max-width: 1000px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left-width: 8px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+/* ==== COLORES POR ESTATUS ==== */
+.tarea-item.completada { border-left: 8px solid #28A745; }
+.tarea-item.pendiente { border-left: 8px solid #DC3545; }
+
+/* Hover y selección sin mover padding ni tamaño */
+.tarea-item.completada .tarea-titulo:hover,
+.tarea-item.completada.tarea-abierta .tarea-titulo {
+  background-color: #E3F9E7;
+}
+
+.tarea-item.pendiente .tarea-titulo:hover,
+.tarea-item.pendiente.tarea-abierta .tarea-titulo {
+  background-color: #FDE2E2;
+}
+
+/* Efecto hover tarjeta */
+.tarea-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* ==== CABECERA / TÍTULO ==== */
+.tarea-titulo {
+  padding: 14px 20px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+  border-bottom: 1px solid rgba(237, 240, 243, 0.6);
+  transition: background-color 0.3s ease;
+}
+
+.tarea-titulo-derecha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Badge de estatus */
+.tarea-estatus {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.tarea-estatus.completada { background-color: #28A745; }
+.tarea-estatus.pendiente { background-color: #DC3545; }
+
+/* Flecha acordeón */
+.flecha {
+  font-size: 16px;
+  color: #000000;
+  transition: transform 0.3s ease, color 0.2s;
+}
+
+/* ==== CONTENIDO / DETALLES ==== */
+.tarea-detalle {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease; /* quitar padding de la transición */
+  padding: 0 20px;                  /* padding horizontal siempre igual */
+  font-size: 14px;
+  color: #444444;
+  line-height: 1.5;
+  background-color: #ffffff;
+}
+
+.tarea-detalle.abierta {
+  max-height: 400px;
+  padding-top: 14px;   /* solo top y bottom se agregan */
+  padding-bottom: 14px;
+}
+
+/* Columnas detalle */
+.detalle-columna {
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.detalle-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1A1A1A;
+}
+
+.detalle-valor {
+  color: #555555;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+/* ==== MEDIA QUERIES PARA MÓVIL ==== */
+@media (max-width: 768px) {
+  .proyecto-descripcion-contenedor,
+  .tarea-item {
+    padding: 12px 16px;
+    border-left-width: 6px;
+  }
+
+  .tarea-titulo {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
+  .detalle-label,
+  .detalle-valor {
+    font-size: 13px;
+  }
+
+  .flecha {
+    font-size: 14px;
+  }
+
+  .tarea-estatus {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .proyecto-descripcion-contenedor,
+  .tarea-item {
+    padding: 10px 12px;
+  }
+
+  .tarea-titulo {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .detalle-label,
+  .detalle-valor {
+    font-size: 12px;
+  }
+
+  .tarea-estatus {
+    font-size: 10px;
+    padding: 1px 5px;
+  }
+}

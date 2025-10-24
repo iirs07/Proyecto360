@@ -1,0 +1,63 @@
+/* ========================
+   Contenedor externo centrado y adaptativo
+======================== */
+.login-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;       /* ocupa toda la pantalla */
+  padding: 0;              /* quitar padding extra */
+  overflow: hidden;        /* evita scroll */
+}
+
+/* ========================
+   Contenedor compacto escalado
+======================== */
+.registro-compacto {
+  max-width: 450px;
+  width: 100%;             /* adaptativo a la pantalla */
+  padding: 20px 25px;
+  border-radius: 20px;    
+  transform: scale(0.9);       /* reduce todo al 60% */
+  transform-origin: center center; 
+  box-sizing: border-box;       /* incluye padding en el ancho */
+}
+/* Error debajo de cada input */
+.login-error-msg {
+  color: #d8000c;
+  padding: 5px 10px;
+  margin-top: 4px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Error general centrado */
+
+.login-error-general {
+  color: #d8000c;
+  padding: 5px 10px;
+  margin-top: 4px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.login-olvidaste {
+  padding: 5px 16px;
+  font-size: 14px;       /* tamaño realista para formulario */
+  font-weight: bold;
+  color: #861542;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+

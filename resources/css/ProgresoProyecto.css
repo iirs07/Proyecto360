@@ -1,0 +1,125 @@
+/* ================================
+   Contenedor general del progreso
+================================ */
+.contenedor-progreso-chart {
+  width: 100%;
+  max-width: 850px;
+  margin: 40px auto;                /* centrado horizontal */
+  padding: 20px;
+  border-radius: 18px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  color: #000000;
+  height: auto; /* se ajusta al contenido */
+
+
+  display: flex;                    
+  flex-direction: column;           
+  align-items: center;              /* centra elementos internos horizontalmente */
+
+  overflow: hidden;                 /* evita que barras o sombras sobresalgan */
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
+}
+
+.contenedor-progreso-chart:hover {
+  background-color: rgba(178,35,78,0.1);
+}
+
+/* ================================
+   Fondo de la barra
+================================ */
+.barra-fondo {
+  width: 90%;           /* ancho relativo */
+  max-width: 600px;     /* ancho máximo */
+  height: 28px;
+  background: #e5e5e5;
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 12px auto;    /* centrado horizontal */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* ================================
+   Barra de progreso principal
+================================ */
+.barra-progreso {
+  height: 100%;
+  display: flex;
+  align-items: center;          /* centra verticalmente el texto */
+  justify-content: center;      /* centra horizontalmente */
+  color: #000000;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 14px;
+  transition: width 0.8s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #0078d7, #0062b5);
+  box-shadow: 0 2px 8px rgba(0, 120, 215, 0.3);
+}
+
+/* Destello animado dentro de la barra */
+.barra-progreso::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: destello 1.8s linear infinite;
+}
+
+/* Animación del destello */
+@keyframes destello {
+  0% { left: -50%; }
+  100% { left: 100%; }
+}
+
+/* ================================
+   Texto dentro de la barra
+================================ */
+.porcentaje-en-barra {
+  position: relative;
+  z-index: 1;
+  font-size: 13px;
+  text-align: center;        /* centrado horizontal */
+  width: 100%;
+  pointer-events: none;      /* evita que interfiera con hover */
+}
+
+/* ================================
+   Texto descriptivo debajo
+================================ */
+.texto-progreso p {
+  margin: 10px 0 0 0;
+  font-weight: 700;           /* más grueso */
+  text-align: center;
+  color: #000000;             /* color más intenso */
+  font-size: 15px;
+  letter-spacing: 0.3px;
+}
+
+/* ================================
+   Responsive móvil
+================================ */
+@media (max-width: 576px) {
+  .barra-fondo {
+    width: 95%;              /* ocupar más espacio en móvil */
+  }
+  .barra-progreso {
+    font-size: 12px;         /* texto más pequeño para móviles */
+  }
+  .porcentaje-en-barra {
+    font-size: 12px;
+  }
+  .texto-progreso p {
+    font-size: 14px;
+  }
+}

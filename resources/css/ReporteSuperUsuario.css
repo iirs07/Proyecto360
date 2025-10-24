@@ -1,0 +1,212 @@
+.reporte-container {
+  max-width: 630px;
+  margin: 5px auto;
+  padding: 25px 35px;
+  border-radius: 12px;
+  background: #f5f5f5e8; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: left;
+  position: relative;
+  z-index: 2;
+}
+
+
+/* Título de secciones centrado */
+.titulo-seccion {
+  display: block;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #861542;
+}
+
+/* Form labels */
+.form-section label {
+  font-weight: 600;
+  font-size: 18px;
+  color: #000000;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Contenedor de áreas */
+.areas-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #f7f8fa;
+}
+
+/* Cada área */
+.area-item {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px 0;
+  border-radius: 6px;
+}
+
+.area-item:hover {
+  background-color: #f0e6f6;
+}
+
+/* Encabezado del área: checkbox, nombre y flecha */
+.area-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.area-header input[type="checkbox"] {
+  accent-color: #861542;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.area-nombre {
+  flex-grow: 1;
+  font-weight: 500;
+  color: #861542;
+}
+
+.flecha-area {
+  cursor: pointer;    /* cambia el cursor a una mano al pasar por encima, indicando que es clickeable */
+  font-size: 16px;    /* tamaño de la flecha (o ícono de despliegue) */
+  color: #861542;    /* color de la flecha */
+  margin-left: 10px;  /* separa la flecha del elemento de la izquierda dejando un espacio de 70px */
+}
+
+
+/* Lista de departamentos dentro de cada área */
+.area-departamentos {
+  padding-left: 30px;
+  margin-top: 8px;
+}
+
+.area-departamentos label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #000000;
+}
+
+.area-departamentos input[type="checkbox"] {
+  accent-color: #861542;
+  width: 16px;
+  height: 16px;
+}
+
+/* Sección de periodo */
+.periodo-section {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.periodo-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.periodo-row span {
+  font-weight: 500;
+  color: #000000;
+}
+
+.periodo-section select,
+.periodo-section input[type="month"],
+.periodo-section input[type="date"] {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  min-width: 120px;
+  transition: 0.3s;
+}
+
+.periodo-section select:hover,
+.periodo-section input[type="month"]:hover,
+.periodo-section input[type="date"]:hover {
+  border-color: #861542;
+  box-shadow: 0 0 5px rgba(134, 21, 66, 0.3);
+}
+
+/* Tipo de proyecto */
+.tipo-proyecto-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.tipo-proyecto-section select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  min-width: 200px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.tipo-proyecto-section select:hover {
+  border-color: #861542;
+  box-shadow: 0 0 5px rgba(134, 21, 66, 0.3);
+}
+
+/* Botón generar */
+.boton-generar-section {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-generar {
+  background-color: #861542;
+  color: #fff;
+  font-weight: 600;
+  padding: 14px 40px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+  box-shadow: 0 5px 15px rgba(134, 21, 66, 0.3);
+}
+
+.btn-generar:hover {
+  background-color: #a71b62;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(134, 21, 66, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .reporte-container {
+    padding: 20px 15px;
+  }
+
+  .periodo-section select,
+  .periodo-section input[type="month"],
+  .periodo-section input[type="date"],
+  .tipo-proyecto-section select {
+    min-width: 100%;
+  }
+
+  .periodo-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .area-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
