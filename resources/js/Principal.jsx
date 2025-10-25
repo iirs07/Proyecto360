@@ -119,7 +119,7 @@ export default function Principal() {
             <span className="titulo-barra-global">GESTIÓN DE DEPARTAMENTOS</span>
           </div>
         </div>
-
+ 
         <div className="areas-grid-departamentos" style={{ paddingTop: "20px" }}>
           {areas.map((area) => (
             <div key={area.id} className="area-item-departamentos">

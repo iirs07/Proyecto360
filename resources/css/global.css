@@ -235,7 +235,7 @@ html {
   width: 300px;
   max-width: 80%;
   opacity: 0.4;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
   transition: transform 0.3s, width 0.3s;
 }
