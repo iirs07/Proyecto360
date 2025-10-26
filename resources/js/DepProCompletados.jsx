@@ -132,7 +132,7 @@ export default function DepProCompletados() {
               <div key={proyecto.id_proyecto} className="proyecto-linea-item completado">
                 {/* Fila 1: Nombre */}
                 <div className="proyecto-nombre">
-                  <span className="proyecto-label">Nombre</span>
+                  <span className="proyecto-label">Nombre: </span>
                   <span className="proyecto-valor">{proyecto.p_nombre}</span>
                 </div>
 

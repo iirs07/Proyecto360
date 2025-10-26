@@ -1,215 +1,159 @@
-/* ================================    
-   Contenedor general de proyectos 
-================================= */
+/* =========================================================================
+   CONTENEDOR Y TARJETA DE PROYECTOS (ESTÉTICA COMPACTADA)
+   ========================================================================= */
+
 /* Contenedor general de proyectos */
 .proyectos-linea {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px;
-  /* no poner background-color aquí, para que el logo de fondo se vea */
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Reducido de 16px */
+    padding: 15px; /* Reducido de 20px */
 }
 
-/* Reduce el espacio entre los datos y la barra */
+/* Tarjeta de Proyecto (Item) */
 .proyecto-linea-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px; /* antes 12px — reduce la separación general */
-  background-color: #f0f0f0;
-  padding: 14px 22px;
-  border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-  z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Reducido de 12px */
+    
+    background-color: #ffffff; 
+    padding: 12px 20px; /* ✅ REDUCIDO: Menos padding interno */
+    border-radius: 10px; /* Ligeramente menos redondeado */
+    
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* Sombra más sutil */
+    
+    z-index: 2;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: .5px solid #861542; 
 }
 
-/* Ajusta el espacio inferior de la sección de columnas */
-.proyecto-columnas {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  padding-bottom: 0; /* elimina el espacio extra debajo de los datos */
-  margin-bottom: 2px; /* deja un margen sutil entre datos y barra */
+.proyecto-linea-item:hover {
+    transform: translateY(-2px); /* Movimiento de hover más sutil */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
-
-/* Fila 1: Nombre del proyecto */
+/* Fila 1: Nombre del proyecto (Título principal) */
 .proyecto-nombre {
-  display: flex;
-  flex-direction: column;
+    margin-bottom: 5px;
+    padding-bottom: 5px; /* Menos espacio bajo el nombre */
+    border-bottom: 1px solid #f5f5f5; /* Línea separadora más sutil */
+}
+
+.proyecto-nombre .proyecto-label {
+    font-size: 0.8rem; /* Título label más pequeño */
+    margin-bottom: 2px;
 }
 
 .proyecto-nombre .proyecto-valor {
-  white-space: normal;
-  word-break: break-word;
+    font-size: 1rem; /* Título un poco más pequeño */
+    font-weight: 1000; /* Se mantiene audaz */
 }
 
-/* Fila 2: Datos en línea horizontal con scroll si no cabe */
+/* Fila 2: Contenedor de datos cortos */
+.proyecto-columnas {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap; 
+    justify-content: flex-start; 
+    gap: 10px 25px; 
+    margin-bottom: 5px; 
+    padding-bottom: 0;
+}
 
-/* Cada columna: etiqueta + valor en fila */
 .proyecto-linea-columna {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-  min-width: max-content; /* evita que el contenido se rompa */
-  flex-shrink: 0;         /* que no se reduzca al hacer scroll */
-}
-
-.proyecto-linea-columna .proyecto-label {
-  font-weight: 800;
-  color: #600d2a;
-}
-
-.proyecto-linea-columna .proyecto-valor {
-  font-weight: 600;
-  color: #111;
+    flex: 0 0 auto; 
+    min-width: 140px; 
+    display: flex;
+    flex-direction: column; 
+    gap: 1px; 
+    padding-right: 10px;
 }
 
 /* Fila 3: Barra de progreso */
 .proyecto-linea-progreso-container {
-  width: 100%;
+    width: 100%;
+    padding-top: 10px; /* Reducido */
+    border-top: 1px solid #f0f0f0; 
 }
 
-/* Etiquetas y valores */
+/* Etiquetas y valores - JERARQUÍA CLARA */
 .proyecto-label {
-  font-family: 'Merriweather', serif;
-  font-weight: 800;
-  margin-bottom: 2px;
-  color: #600d2a;
-  font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif; 
+    font-weight: 600; /* Ligeramente más ligero */
+    color: #600d2a; 
+    font-size: 0.75rem; /* ✅ Más pequeño y compacto */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .proyecto-valor {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  color: #111;
-  font-size: 0.95rem;
-  line-height: 1.35em;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    color: #000000; 
+    font-size: 0.9rem; /* ✅ Más pequeño y compacto */
+    line-height: 1.3;
+}
+
+/* Estilo específico para el valor de estatus */
+.proyecto-valor[style*="Finalizado"] {
+    font-weight: 700;
+    color: #28A745;
 }
 
 /* Mensaje si no hay proyectos */
 .proyecto-sin-tareas {
-  display: block;
-  font-style: italic;
-  color: #555;
-  margin-top: 10px;
-  text-align: center;
-  font-size: 0.95rem;
+    display: block;
+    font-style: italic;
+    color: #555;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 0.9rem;
 }
 
-/* ================================    
-   Responsive
-================================= */
-/* ================================
-   Responsive mejorado
-================================= */
-@media (max-width: 768px) {
-  .proyecto-columnas {
-    gap: 12px;
-    flex-wrap: wrap; /* permite que las columnas bajen si no caben */
-  }
 
-  .proyecto-linea-columna {
-    min-width: 45%; /* ancho mínimo de cada columna para tablet */
-    max-width: 100%;
-  }
+/* =========================================================================
+   MEDIA QUERIES (RESPONSIVIDAD COMPACTA)
+   ========================================================================= */
+
+@media (max-width: 768px) {
+    .proyecto-linea-item {
+        padding: 10px 15px; /* Más compacto en tablet */
+    }
+    
+    .proyecto-columnas {
+        gap: 10px 15px; /* Más compacto */
+    }
+    
+    .proyecto-linea-columna {
+        flex: 1 1 calc(50% - 10px); 
+        min-width: 130px;
+    }
 }
 
 @media (max-width: 480px) {
-  .proyecto-linea-item {
-    padding: 12px 16px;
-    gap: 10px;
-  }
+    .proyecto-linea-item {
+        padding: 10px 12px;
+    }
+    
+    .proyecto-nombre .proyecto-valor {
+        font-size: 1.05rem;
+    }
+    
+    /* En móvil estrecho, forzamos una columna completa */
+    .proyecto-columnas {
+        gap: 8px;
+    }
 
-  .proyecto-columnas {
-    flex-direction: column; /* una columna por fila en móviles */
-    gap: 8px;
-  }
+    .proyecto-linea-columna {
+        flex: 1 1 100%; /* Una columna por fila */
+        min-width: 100%;
+    }
 
-  .proyecto-linea-columna {
-    min-width: 100%; /* ocupar toda la fila */
-    max-width: 100%;
-  }
+    .proyecto-label {
+        font-size: 0.7rem;
+    }
 
-  .proyecto-label {
-    font-size: 0.85rem;
-  }
-
-  .proyecto-valor {
-    font-size: 0.85rem;
-  }
-}
-
-.detalle-Evidencia-container {
-  display: flex;
-  align-items: center; /* centra verticalmente el label y los íconos */
-  gap: 29px; /* espacio entre label y primer ícono */
-}
-
-.evidencias-container {
-  display: flex;
-  gap: 5px; /* espacio entre los íconos */
-}
-
-.detalle-Evidencia {
-  width: 40px; /* tamaño reducido */
-  height: 30px;
-}
-
-.evidencia-icono {
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  opacity: 1 !important;
-  transition: transform 0.2s ease;
-  filter: brightness(1.1) contrast(1.2);
-}
-
-.evidencia-icono:hover {
-  transform: scale(1.1);
-}
-
-
-/* Modal para mostrar la imagen */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 90%;
-  max-height: 90%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.modal-img {
-  max-width: 100%;
-  max-height: 80vh;
-  object-fit: contain;
-}
-
-/* Botón de cerrar modal */
-.modal-close {
-  margin-top: 15px;
-  padding: 6px 12px;
-  cursor: pointer;
-  background-color: #e74c3c;
-  border: none;
-  color: white;
-  border-radius: 4px;
-  font-weight: bold;
+    .proyecto-valor {
+        font-size: 0.85rem;
+    }
 }
