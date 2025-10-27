@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\ReporteController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\InvitacionController;
@@ -12,6 +12,7 @@ use App\Http\Controllers\TareaController;
 use App\Http\Controllers\TareasController;
 use App\Http\Controllers\ProyectosController; // Tu controlador para proyectos por departamento
 use App\Http\Controllers\ProgresoController;
+Route::get('/reporte', [ReporteController::class, 'generarPDF']);
 
 Route::get('/departamentos/{depId}/progresos', [ProgresoController::class, 'obtenerProgresosPorDepartamento']);
 

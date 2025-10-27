@@ -26,16 +26,17 @@ function Login() {
     setErrorPassword("");
     setErrorGeneral("");
 
-    // Validaciones usuario
-    if (!username) {
-      setErrorUsername("❌ Ingresa usuario");
-      hasError = true;
-      setTimeout(() => setErrorUsername(""), 3000);
-    } else if (!/^[a-z0-9]+$/i.test(username)) {
-      setErrorUsername("❌ Usuario no válido");
-      hasError = true;
-      setTimeout(() => setErrorUsername(""), 3000);
-    }
+    // Validación usuario
+if (!username) {
+  setErrorUsername("❌ Ingresa usuario");
+  hasError = true;
+  setTimeout(() => setErrorUsername(""), 3000);
+} else if (!/^[a-zA-Z0-9._]+$/.test(username)) {
+  setErrorUsername("❌ Usuario no válido");
+  hasError = true;
+  setTimeout(() => setErrorUsername(""), 3000);
+}
+
 
     // Validaciones contraseña
     if (!password) {
