@@ -214,42 +214,121 @@
   font-size: 14px; 
 }
 /* =========================================================================
-   BOTÓN GENERAR REPORTE (ESTILO DE LOGIN FINAL)
+   BOTÓN GENERAR REPORTE (Ajustado)
    ========================================================================= */
 .boton-generar-section {
     width: 100%;
-    max-width: 800px; 
+    max-width: 800px;
     margin: 25px auto 0;
-    padding: 0; /* ✅ MODIFICADO: Eliminado el padding lateral */
+    padding: 0;
     text-align: center;
+    /* Necesario para centrar el contenido (botón o barra) */
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
 }
+
 .btn-generar {
-    /* ✅ Colores y forma del botón de login */
+    /* Colores y forma originales */
     width: 100%;
     max-width: 190px; 
     padding: 8px 20px;
-    background-color: #861542;
+    background-color: #861542; /* Color principal de tu tema */
     color: white;
     border: none;
     border-radius: 20px;
     font-size: 15px; 
     font-weight: 700;
-    margin: 0 auto; /* CLAVE: Centrado horizontal */
+    margin: 0 auto; 
     display: flex;
-    justify-content: center; /* CLAVE: Centrado del contenido interno */
+    justify-content: center; 
     align-items: center;
     transition: background-color 0.3s, transform 0.2s;
     font-family: 'Poppins', sans-serif;
     cursor: pointer;
 }
+
 .btn-generar:hover:not(:disabled) { 
-    background-color: #5c0f2d; 
+    background-color: #861542; /* 🔴 Rojo al pasar el mouse (como solicitaste) */
     transform: translateY(-2px); 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
-.alerta-seleccion { 
-    color: #861542; 
-    margin-top: 15px; 
-    font-size: 14px; 
-    font-weight: 500; 
+
+.btn-generar:disabled {
+    /* Estilo de botón deshabilitado (cuando no hay departamentos) */
+    background-color: #ccc;
+    cursor: not-allowed;
+    color: #a0a0a0;
+    transform: none; /* Quitar la transformación en disabled */
+    box-shadow: none;
+}
+.alerta-seleccion {
+    margin-top: 10px;
+    color: #ff9800; /* Naranja para alerta */
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+/* -------------------------------------------------------------------------
+   Barra de Progreso y Cancelar (Usando el color principal de tu tema)
+   ------------------------------------------------------------------------- */
+
+.progress-container {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.progress-bar-label {
+    font-weight: bold;
+    color: #861542; /* Color principal de tu tema */
+    margin-bottom: 5px;
+}
+
+.progress-bar-wrapper {
+    width: 100%;
+    height: 25px;
+    background-color: #fce4ec; /* Fondo muy claro basado en el color principal */
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #861542; /* 🟢 Color principal de tu tema para el avance */
+    transition: width 0.15s linear; /* Transición lineal más suave para el 99% */
+    border-radius: 12px 0 0 12px;
+}
+
+/* Botón de Cancelar */
+.btn-cancelar {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    font-size: 1em;
+    font-weight: 600;
+    border: 2px solid #861542; 
+    border-radius: 6px;
+    background-color: white;
+    color: #861542;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cancelar:hover {
+    background-color: #861542;
+    color: white;
+}
+
+.icon-cancelar {
+    margin-right: 8px;
+}
+/* Cambia el color de la palomita y el fondo del checkbox seleccionado */
+input[type="checkbox"] {
+    accent-color: #861542; /* Cambia aquí al color que quieras */
 }

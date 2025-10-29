@@ -45,13 +45,6 @@ $meses = [
     @endif
 </h2>
 
-<div class="filtros-aplicados">
-    <p><strong>Estatus:</strong> 
-        {{ $filtros['tipoProyecto'] === 'Finalizados' ? 'Finalizados' : 
-           ($filtros['tipoProyecto'] === 'EnProceso' ? 'En Proceso' : 'Ambos') }}
-    </p>
-</div>
-
 <div class="tabla-proyectos-container">
     @if(empty($proyectosAgrupados))
         <p class="alerta-sin-datos">⚠️ No se encontraron proyectos con los filtros seleccionados.</p>

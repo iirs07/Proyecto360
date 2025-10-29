@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { FaHome, FaFileAlt, FaUsers } from "react-icons/fa";
+import { FaHome, FaFileAlt, FaUsers, FaTimesCircle } from "react-icons/fa"; 
 import { useNavigate } from "react-router-dom";
 import "../css/global.css";
 import "../css/ReporteSuperUsuario.css";
 import logo3 from "../imagenes/logo3.png";
-import PdfViewer from "./PdfViewer"; // Componente importado correctamente
+import PdfViewer from "./PdfViewer"; 
 
 export default function ReporteSuperUsuario() {
     // ⬅️ ESTADOS AÑADIDOS PARA EL VISOR DE PDF
@@ -23,6 +23,10 @@ export default function ReporteSuperUsuario() {
     const [mes, setMes] = useState("");
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isGenerating, setIsGenerating] = useState(false);
+    
+    // 🟢 ESTADO PARA LA BARRA DE PROGRESO
+    const [generationProgress, setGenerationProgress] = useState(0); 
 
     const navigate = useNavigate();
 
@@ -102,72 +106,107 @@ export default function ReporteSuperUsuario() {
 
     const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
-    // ⬇️ FUNCIÓN CORREGIDA para usar la ruta /api/reporte ⬇️
-    const handleGenerarReporte = async () => {
-        if (seleccionados.length === 0) {
-            alert("⚠️ Error: Selecciona al menos un departamento para generar el reporte.");
-            return;
-        }
-
-        let urlFiltros = `?tipoProyecto=${tipoProyecto}&departamentos=${seleccionados.join(",")}`;
-        let alertaPeriodo = "";
-
-        // Lógica de validación y construcción de parámetros de período
-        if (periodo === "Año" && anio) {
-            urlFiltros += `&anio=${anio}`;
-        } else if (periodo === "Mes" && anio && mes) {
-            // Se asegura que si es 'Mes', se envíe el año y el mes
-            const [selectedAnio, selectedMes] = mes.split('-');
-            urlFiltros += `&anio=${selectedAnio}&mes=${selectedMes}`;
-        } else if (periodo === "Rango" && fechaInicio && fechaFin) {
-            urlFiltros += `&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
-        } else if (periodo === "Año" && !anio) {
-            alertaPeriodo = 'Año';
-        } else if (periodo === "Mes" && (!anio || !mes)) {
-            alertaPeriodo = 'Mes/Año';
-        } else if (periodo === "Rango" && (!fechaInicio || !fechaFin)) {
-            alertaPeriodo = 'Rango de fechas';
-        }
-
-        if (alertaPeriodo) {
-            alert(`⚠️ Error: Debes seleccionar un valor para el periodo de tipo "${alertaPeriodo}".`);
-            return;
-        }
-
-        // 🟢 La URL del endpoint de tu API ha sido cambiada a /api/reporte
-        const API_URL = `http://127.0.0.1:8000/api/reporte${urlFiltros}`;
-
-        console.log("Solicitando Reporte a:", API_URL);
-
-        try {
-            const response = await fetch(API_URL);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                // Intenta parsear el JSON de error si es posible
-                let errorMessage = `Error ${response.status}: ${errorText.substring(0, 100)}`;
-                try {
-                    const errorJson = JSON.parse(errorText);
-                    if (errorJson.message) {
-                        errorMessage = `Error ${response.status}: ${errorJson.message}`;
-                    }
-                } catch (e) {
-                    // No es un JSON, usar el texto plano
+    // 🟢 FUNCIÓN para simular el progreso (AJUSTADA AL 99%)
+    const simulateProgress = () => {
+        setGenerationProgress(0); // Reiniciar al inicio
+        // Simular progreso cada 150ms
+        const interval = setInterval(() => {
+            setGenerationProgress(prev => {
+                // Si ya estamos cerca del 99%, paramos aquí.
+                if (prev >= 95) { 
+                    clearInterval(interval);
+                    return 99; // 🟢 Aseguramos que se quede en 99%
                 }
-                throw new Error(errorMessage);
-            }
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-
-            setPdfUrl(url);
-            setShowPdfViewer(true);
-
-        } catch (error) {
-            console.error("Error al generar el reporte:", error);
-            alert(`❌ Ocurrió un error al generar el reporte: ${error.message}`);
-        }
+                // Incremento más dinámico para llegar al 99%
+                const increment = Math.floor(Math.random() * 8) + 3; // Incremento aleatorio entre 3 y 10
+                const nextProgress = prev + increment;
+                return nextProgress < 99 ? nextProgress : 99;
+            });
+        }, 150);
+        return interval;
     };
+    
+    // 🟢 FUNCIÓN para cancelar la generación 
+    const handleCancelGeneration = () => {
+        setIsGenerating(false);
+        setGenerationProgress(0);
+        console.log("Generación de reporte cancelada por el usuario.");
+    };
+
+
+    // ⬇️ FUNCIÓN handleGenerarReporte (con limpieza del mes) ⬇️
+const handleGenerarReporte = async () => {
+    if (seleccionados.length === 0) {
+        alert("⚠️ Error: Selecciona al menos un departamento para generar el reporte.");
+        return;
+    }
+
+    let urlFiltros = `?tipoProyecto=${tipoProyecto}&departamentos=${seleccionados.join(",")}`;
+    let alertaPeriodo = "";
+
+    if (periodo === "Año" && anio) {
+        urlFiltros += `&anio=${anio}`;
+    } else if (periodo === "Mes" && anio && mes) {
+        // 🟢 CORRECCIÓN: 'mes' ahora es solo el número del mes (ej: "01"), 
+        // ya no se requiere split() como en la versión anterior.
+        urlFiltros += `&anio=${anio}&mes=${mes}`; 
+    } else if (periodo === "Rango" && fechaInicio && fechaFin) {
+        urlFiltros += `&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+    } else if (periodo === "Año" && !anio) {
+        alertaPeriodo = 'Año';
+    } else if (periodo === "Mes" && (!anio || !mes)) {
+        alertaPeriodo = 'Mes/Año';
+    } else if (periodo === "Rango" && (!fechaInicio || !fechaFin)) {
+        alertaPeriodo = 'Rango de fechas';
+    }
+
+    if (alertaPeriodo) {
+        alert(`⚠️ Error: Debes seleccionar un valor para el periodo de tipo "${alertaPeriodo}".`);
+        return;
+    }
+
+    const API_URL = `http://127.0.0.1:8000/api/reporte${urlFiltros}`;
+    console.log("Solicitando Reporte a:", API_URL);
+
+    let progressInterval = null; 
+
+    try {
+        setIsGenerating(true); 
+        progressInterval = simulateProgress(); 
+
+        const response = await fetch(API_URL);
+        
+        clearInterval(progressInterval); 
+
+        if (!response.ok) {
+            throw new Error(`Error al generar reporte (${response.status})`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        setPdfUrl(url);
+        
+        // Finaliza al 100% y abre el visor
+        setGenerationProgress(100); 
+        setTimeout(() => {
+            setShowPdfViewer(true);
+            setGenerationProgress(0); 
+        }, 500); 
+
+    } catch (error) {
+        clearInterval(progressInterval); 
+        console.error("Error al generar el reporte:", error);
+        alert(`❌ Ocurrió un error al generar el reporte: ${error.message}`);
+        setGenerationProgress(0); 
+    } finally {
+        // La barra se oculta un poco después de que se abre el PDF (gracias al setTimeout)
+        // Pero es seguro dejarlo aquí para el caso de error
+        if (!showPdfViewer) {
+            setIsGenerating(false); 
+        }
+    }
+};
+
 
     // ⬅️ FUNCIÓN PARA CERRAR EL VISOR Y LIBERAR MEMORIA
     const handleClosePdfViewer = () => {
@@ -354,8 +393,8 @@ export default function ReporteSuperUsuario() {
                                                 >
                                                     <option value="">-- Mes --</option>
                                                     {listaMeses.map((m) => (
-                                                        // El valor es año-mes para poder parsearlo en handleGenerarReporte
-                                                        <option key={m.value} value={`${anio}-${m.value}`}>
+                                                        // 🟢 CORRECCIÓN: El valor es SOLO el mes.
+                                                        <option key={m.value} value={m.value}>
                                                             {m.label}
                                                         </option>
                                                     ))}
@@ -398,26 +437,51 @@ export default function ReporteSuperUsuario() {
                         </div>
                         {/* ⬆️ FIN DE LÍNEAS DE CÓDIGO FALTANTES ⬆️ */}
 
-                        {/* Botón de Reporte */}
+                        {/* Botón y barra de progreso */}
                         <div className="boton-generar-section">
-                            <button
-                                className="btn-generar"
-                                onClick={handleGenerarReporte}
-                                disabled={seleccionados.length === 0}
-                            >
-                                Generar Reporte
-                            </button>
-                            {seleccionados.length === 0 && (
-                                <p className="alerta-seleccion">
-                                    ⚠ Selecciona al menos un departamento para habilitar el reporte.
-                                </p>
+                            {isGenerating ? (
+                                // 🟢 BARRA DE PROGRESO Y BOTÓN DE CANCELAR
+                                <div className="progress-container">
+                                    <div className="progress-bar-label">
+                                        Generando Reporte: {generationProgress}%
+                                    </div>
+                                    <div className="progress-bar-wrapper">
+                                        <div 
+                                            className="progress-bar" 
+                                            style={{ width: `${generationProgress}%` }}
+                                        ></div>
+                                    </div>
+                                    <button 
+                                        className="btn-cancelar" 
+                                        onClick={handleCancelGeneration}
+                                    >
+                                        <FaTimesCircle className="icon-cancelar" />
+                                        Cancelar
+                                    </button>
+                                </div>
+                            ) : (
+                                // 🟢 BOTÓN DE GENERAR (visible cuando no se está generando)
+                                <>
+                                    <button
+                                        className="btn-generar"
+                                        onClick={handleGenerarReporte}
+                                        disabled={seleccionados.length === 0}
+                                    >
+                                        Generar Reporte
+                                    </button>
+                                    {seleccionados.length === 0 && (
+                                        <p className="alerta-seleccion">
+                                            ⚠ Selecciona al menos un departamento para habilitar el reporte.
+                                        </p>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* 🟢 VISOR DE PDF CORREGIDO: Usando PdfViewer en lugar de PdfViewerWithFrame */}
+            
+            {/* 🟢 VISOR DE PDF */}
             {showPdfViewer && pdfUrl && (
                 <PdfViewer 
                     pdfUrl={pdfUrl} 
