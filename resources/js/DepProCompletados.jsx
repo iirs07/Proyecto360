@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { FaHome, FaTasks, FaProjectDiagram, FaUsers } from "react-icons/fa";
+import { FaHome, FaTasks, FaProjectDiagram, FaUsers, FaCaretDown } from "react-icons/fa";
+import logo3 from "../imagenes/logo3.png";
 import "../css/DepProSuperUsuario.css";
 import "../css/global.css";
-import logo3 from "../imagenes/logo3.png";
 import ProgresoProyecto from "./ProgresoProyecto";
 
 export default function DepProCompletados() {
@@ -16,7 +16,30 @@ export default function DepProCompletados() {
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 🟢 ESTADOS PARA ORDENAMIENTO
+  const [sortBy, setSortBy] = useState("fechaFin"); // Criterio inicial
+  const [sortDirection, setSortDirection] = useState("desc"); // Dirección inicial
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+
+  // Función unificada para cambiar orden
+  const handleSelectSort = (newSortBy, newSortDirection) => {
+    setSortBy(newSortBy);
+    setSortDirection(newSortDirection);
+    setIsMenuOpen(false); // Cierra el menú
+  };
+
+  // Función para mostrar texto del botón principal
+  const getSortButtonText = () => {
+    const criterioMap = {
+      fechaFin: "Fecha Finalización",
+      fechaInicio: "Fecha Inicio",
+      nombre: "Nombre",
+    };
+    const icon = sortDirection === "asc" ? " ▲ (Asc.)" : " ▼ (Desc.)";
+    return `${criterioMap[sortBy] || "Fecha Finalización"} ${icon}`;
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("jwt_token");
@@ -40,9 +63,10 @@ export default function DepProCompletados() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
-        const proyectosFinalizados = data
-          .filter((p) => p.p_estatus === "Finalizado" && p.total_tareas > 0)
-          .sort((a, b) => new Date(b.pf_fin) - new Date(a.pf_fin));
+        // Filtrar por proyectos Finalizados
+        const proyectosFinalizados = data.filter(
+          (p) => p.p_estatus === "Finalizado" && p.total_tareas > 0
+        );
 
         setProyectos(proyectosFinalizados);
       } catch (err) {
@@ -55,6 +79,22 @@ export default function DepProCompletados() {
 
     fetchDatos();
   }, [depId, navigate]);
+
+  // Ordenamiento dinámico
+  const proyectosOrdenados = [...proyectos].sort((a, b) => {
+    let comparison = 0;
+    const direction = sortDirection === "asc" ? 1 : -1;
+
+    if (sortBy === "fechaFin") {
+      comparison = new Date(a.pf_fin) - new Date(b.pf_fin);
+    } else if (sortBy === "fechaInicio") {
+      comparison = new Date(a.pf_inicio) - new Date(b.pf_inicio);
+    } else if (sortBy === "nombre") {
+      comparison = a.p_nombre.localeCompare(b.p_nombre);
+    }
+
+    return comparison * direction;
+  });
 
   if (loading) {
     return (
@@ -87,7 +127,7 @@ export default function DepProCompletados() {
             {!sidebarCollapsed && <span className="label">Proyectos en proceso</span>}
           </li>
           <li
-            className="menu-item"
+            className="menu-item active"
             onClick={() =>
               navigate(`/proyectoscompletados/${depId}`, { state: { nombre: departamentoNombre } })
             }
@@ -104,12 +144,10 @@ export default function DepProCompletados() {
 
       {/* Contenido principal */}
       <div className={`main-content ${sidebarCollapsed ? "collapsed" : ""}`}>
-        {/* Logo de fondo */}
         <div className="logo-fondo">
           <img src={logo3} alt="Fondo" />
         </div>
 
-        {/* Header */}
         <div className="header-global">
           <div className="header-left" onClick={toggleSidebar}>
             <FaHome className="icono-casa-global" />
@@ -121,22 +159,98 @@ export default function DepProCompletados() {
           </div>
         </div>
 
+        {/* 🟢 Controles de Ordenamiento */}
+        {proyectos.length > 0 && (
+          <div className="sort-controls-container">
+            <span className="sort-label">Ordenar por:</span>
+            <div className="dropdown-sort-menu">
+              <button
+                className="sort-main-button"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {getSortButtonText()}
+                <FaCaretDown className={`dropdown-arrow ${isMenuOpen ? "open" : ""}`} />
+              </button>
+
+              {isMenuOpen && (
+                <div className="dropdown-options">
+                  {/* Fecha Fin */}
+                  <div
+                    className={`dropdown-item ${
+                      sortBy === "fechaFin" && sortDirection === "desc" ? "active" : ""
+                    }`}
+                    onClick={() => handleSelectSort("fechaFin", "desc")}
+                  >
+                    Fecha Finalización - Descendente
+                  </div>
+                  <div
+                    className={`dropdown-item ${
+                      sortBy === "fechaFin" && sortDirection === "asc" ? "active" : ""
+                    }`}
+                    onClick={() => handleSelectSort("fechaFin", "asc")}
+                  >
+                    Fecha Finalización - Ascendente
+                  </div>
+
+                  <hr className="dropdown-divider" />
+
+                  {/* Fecha Inicio */}
+                  <div
+                    className={`dropdown-item ${
+                      sortBy === "fechaInicio" && sortDirection === "desc" ? "active" : ""
+                    }`}
+                    onClick={() => handleSelectSort("fechaInicio", "desc")}
+                  >
+                    Fecha Inicio - Descendente
+                  </div>
+                  <div
+                    className={`dropdown-item ${
+                      sortBy === "fechaInicio" && sortDirection === "asc" ? "active" : ""
+                    }`}
+                    onClick={() => handleSelectSort("fechaInicio", "asc")}
+                  >
+                    Fecha Inicio - Ascendente
+                  </div>
+
+                  <hr className="dropdown-divider" />
+
+                  {/* Nombre */}
+                  <div
+                    className={`dropdown-item ${
+                      sortBy === "nombre" && sortDirection === "asc" ? "active" : ""
+                    }`}
+                    onClick={() => handleSelectSort("nombre", "asc")}
+                  >
+                    Nombre (A → Z) - Ascendente
+                  </div>
+                  <div
+                    className={`dropdown-item ${
+                      sortBy === "nombre" && sortDirection === "desc" ? "active" : ""
+                    }`}
+                    onClick={() => handleSelectSort("nombre", "desc")}
+                  >
+                    Nombre (Z → A) - Descendente
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Lista de proyectos */}
         <div className="proyectos-linea">
-          {proyectos.length === 0 ? (
+          {proyectosOrdenados.length === 0 ? (
             <p className="proyecto-sin-tareas">
               No hay proyectos finalizados en este departamento.
             </p>
           ) : (
-            proyectos.map((proyecto) => (
+            proyectosOrdenados.map((proyecto) => (
               <div key={proyecto.id_proyecto} className="proyecto-linea-item completado">
-                {/* Fila 1: Nombre */}
                 <div className="proyecto-nombre">
                   <span className="proyecto-label">Nombre: </span>
                   <span className="proyecto-valor">{proyecto.p_nombre}</span>
                 </div>
 
-                {/* Fila 2: Datos horizontales */}
                 <div className="proyecto-columnas">
                   <div className="proyecto-linea-columna">
                     <span className="proyecto-label">Fecha inicio:</span>
@@ -156,7 +270,6 @@ export default function DepProCompletados() {
                   </div>
                 </div>
 
-                {/* Fila 3: Progreso */}
                 <div className="proyecto-linea-progreso-container">
                   <div
                     className="proyecto-linea-progreso"
