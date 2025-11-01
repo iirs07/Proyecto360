@@ -1,52 +1,68 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { FaHome, FaTasks, FaProjectDiagram, FaUsers, FaCaretDown } from "react-icons/fa";
-import logo3 from "../imagenes/logo3.png";
+import { FaCaretDown } from "react-icons/fa";
 import "../css/DepProSuperUsuario.css";
 import "../css/global.css";
+import logo3 from "../imagenes/logo3.png";
 import ProgresoProyecto from "./ProgresoProyecto";
+import Layout from "../components/Layout";
+import MenuDinamico from "../components/MenuDinamico";
+import { slugify } from "./utils/slugify";
+import { useProyectosOrdenados } from "../hooks/useProyectosOrdenados";
 
 export default function DepProCompletados() {
-  const { depId } = useParams();
+  // -----------------------------
+  // URL y Persistencia
+  // -----------------------------
+  const { depNombreSlug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const departamentoNombre = location.state?.nombre || "Departamento";
+  const stateDepId = location.state?.depId;
+  const savedDepId = localStorage.getItem("last_depId");
+  const depId = stateDepId || savedDepId;
+  const departamentoNombre =
+    location.state?.nombre ||
+    (depNombreSlug ? depNombreSlug.replace(/-/g, " ") : "Departamento");
+  const currentDepartamentoSlug = slugify(departamentoNombre);
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // -----------------------------
+  // Estados
+  // -----------------------------
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🟢 ESTADOS PARA ORDENAMIENTO
-  const [sortBy, setSortBy] = useState("fechaFin"); // Criterio inicial
-  const [sortDirection, setSortDirection] = useState("desc"); // Dirección inicial
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // -----------------------------
+  // Hook de ordenamiento
+  // -----------------------------
+  const {
+    proyectosOrdenados,
+    sortBy,
+    sortDirection,
+    isMenuOpen,
+    setIsMenuOpen,
+    handleSelectSort,
+    getSortButtonText,
+  } = useProyectosOrdenados(proyectos);
 
-  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-
-  // Función unificada para cambiar orden
-  const handleSelectSort = (newSortBy, newSortDirection) => {
-    setSortBy(newSortBy);
-    setSortDirection(newSortDirection);
-    setIsMenuOpen(false); // Cierra el menú
-  };
-
-  // Función para mostrar texto del botón principal
-  const getSortButtonText = () => {
-    const criterioMap = {
-      fechaFin: "Fecha Finalización",
-      fechaInicio: "Fecha Inicio",
-      nombre: "Nombre",
-    };
-    const icon = sortDirection === "asc" ? " ▲ (Asc.)" : " ▼ (Desc.)";
-    return `${criterioMap[sortBy] || "Fecha Finalización"} ${icon}`;
-  };
-
+  // -----------------------------
+  // Fetch de proyectos finalizados
+  // -----------------------------
   useEffect(() => {
     const token = localStorage.getItem("jwt_token");
     if (!token) {
-      navigate("/login");
+      navigate("/login", { replace: true });
       return;
     }
+
+    if (!depId) {
+      console.error("ID de departamento no disponible. Redirigiendo.");
+      setLoading(false);
+      navigate("/Principal", { replace: true });
+      return;
+    }
+
+    if (stateDepId) localStorage.setItem("last_depId", stateDepId);
+    else if (depId) localStorage.setItem("last_depId", depId);
 
     const fetchDatos = async () => {
       setLoading(true);
@@ -62,8 +78,6 @@ export default function DepProCompletados() {
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-
-        // Filtrar por proyectos Finalizados
         const proyectosFinalizados = data.filter(
           (p) => p.p_estatus === "Finalizado" && p.total_tareas > 0
         );
@@ -78,23 +92,7 @@ export default function DepProCompletados() {
     };
 
     fetchDatos();
-  }, [depId, navigate]);
-
-  // Ordenamiento dinámico
-  const proyectosOrdenados = [...proyectos].sort((a, b) => {
-    let comparison = 0;
-    const direction = sortDirection === "asc" ? 1 : -1;
-
-    if (sortBy === "fechaFin") {
-      comparison = new Date(a.pf_fin) - new Date(b.pf_fin);
-    } else if (sortBy === "fechaInicio") {
-      comparison = new Date(a.pf_inicio) - new Date(b.pf_inicio);
-    } else if (sortBy === "nombre") {
-      comparison = a.p_nombre.localeCompare(b.p_nombre);
-    }
-
-    return comparison * direction;
-  });
+  }, [depId, navigate, stateDepId, savedDepId]);
 
   if (loading) {
     return (
@@ -109,193 +107,167 @@ export default function DepProCompletados() {
   }
 
   return (
-    <div className="main-layout">
-      {/* Sidebar */}
-      <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <ul>
-          <li className="menu-item" onClick={() => navigate("/Principal")}>
-            <FaHome className="icon" />
-            {!sidebarCollapsed && <span className="label">Inicio</span>}
-          </li>
-          <li
-            className="menu-item"
-            onClick={() =>
-              navigate(`/DepProSuperUsuario/${depId}`, { state: { nombre: departamentoNombre } })
-            }
-          >
-            <FaTasks className="icon" />
-            {!sidebarCollapsed && <span className="label">Proyectos en proceso</span>}
-          </li>
-          <li
-            className="menu-item active"
-            onClick={() =>
-              navigate(`/proyectoscompletados/${depId}`, { state: { nombre: departamentoNombre } })
-            }
-          >
-            <FaProjectDiagram className="icon" />
-            {!sidebarCollapsed && <span className="label">Proyectos finalizados</span>}
-          </li>
-          <li className="menu-item" onClick={() => navigate("/login")}>
-            <FaUsers className="icon" />
-            {!sidebarCollapsed && <span className="label">Cerrar sesión</span>}
-          </li>
-        </ul>
-      </div>
+    <Layout
+      titulo={`PROYECTOS FINALIZADOS DE ${departamentoNombre}`}
+      sidebar={
+        <MenuDinamico
+          departamentoId={depId}
+          departamentoNombre={departamentoNombre}
+          departamentoSlug={currentDepartamentoSlug}
+          activeRoute="completados"
+        />
+      }
+    >
+      {/* Controles de ordenamiento */}
+      {proyectos.length > 0 && (
+        <div className="sort-controls-container">
+          <span className="sort-label">Ordenar por:</span>
+          <div className="dropdown-sort-menu">
+            <button
+              className="sort-main-button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {getSortButtonText()}
+              <FaCaretDown
+                className={`dropdown-arrow ${isMenuOpen ? "open" : ""}`}
+              />
+            </button>
 
-      {/* Contenido principal */}
-      <div className={`main-content ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <div className="logo-fondo">
-          <img src={logo3} alt="Fondo" />
-        </div>
-
-        <div className="header-global">
-          <div className="header-left" onClick={toggleSidebar}>
-            <FaHome className="icono-casa-global" />
-          </div>
-          <div className="barra-center">
-            <span className="titulo-barra-global">
-              PROYECTOS FINALIZADOS DE {departamentoNombre.toUpperCase()}
-            </span>
-          </div>
-        </div>
-
-        {/* 🟢 Controles de Ordenamiento */}
-        {proyectos.length > 0 && (
-          <div className="sort-controls-container">
-            <span className="sort-label">Ordenar por:</span>
-            <div className="dropdown-sort-menu">
-              <button
-                className="sort-main-button"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {getSortButtonText()}
-                <FaCaretDown className={`dropdown-arrow ${isMenuOpen ? "open" : ""}`} />
-              </button>
-
-              {isMenuOpen && (
-                <div className="dropdown-options">
-                  {/* Fecha Fin */}
-                  <div
-                    className={`dropdown-item ${
-                      sortBy === "fechaFin" && sortDirection === "desc" ? "active" : ""
-                    }`}
-                    onClick={() => handleSelectSort("fechaFin", "desc")}
-                  >
-                    Fecha Finalización - Descendente
-                  </div>
-                  <div
-                    className={`dropdown-item ${
-                      sortBy === "fechaFin" && sortDirection === "asc" ? "active" : ""
-                    }`}
-                    onClick={() => handleSelectSort("fechaFin", "asc")}
-                  >
-                    Fecha Finalización - Ascendente
-                  </div>
-
-                  <hr className="dropdown-divider" />
-
-                  {/* Fecha Inicio */}
-                  <div
-                    className={`dropdown-item ${
-                      sortBy === "fechaInicio" && sortDirection === "desc" ? "active" : ""
-                    }`}
-                    onClick={() => handleSelectSort("fechaInicio", "desc")}
-                  >
-                    Fecha Inicio - Descendente
-                  </div>
-                  <div
-                    className={`dropdown-item ${
-                      sortBy === "fechaInicio" && sortDirection === "asc" ? "active" : ""
-                    }`}
-                    onClick={() => handleSelectSort("fechaInicio", "asc")}
-                  >
-                    Fecha Inicio - Ascendente
-                  </div>
-
-                  <hr className="dropdown-divider" />
-
-                  {/* Nombre */}
-                  <div
-                    className={`dropdown-item ${
-                      sortBy === "nombre" && sortDirection === "asc" ? "active" : ""
-                    }`}
-                    onClick={() => handleSelectSort("nombre", "asc")}
-                  >
-                    Nombre (A → Z) - Ascendente
-                  </div>
-                  <div
-                    className={`dropdown-item ${
-                      sortBy === "nombre" && sortDirection === "desc" ? "active" : ""
-                    }`}
-                    onClick={() => handleSelectSort("nombre", "desc")}
-                  >
-                    Nombre (Z → A) - Descendente
-                  </div>
+            {isMenuOpen && (
+              <div className="dropdown-options">
+                {/* Nombre */}
+                <div
+                  className={`dropdown-item ${
+                    sortBy === "nombre" && sortDirection === "asc"
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => handleSelectSort("nombre", "asc")}
+                >
+                  Nombre (A → Z) - Ascendente
                 </div>
-              )}
-            </div>
-          </div>
-        )}
+                <div
+                  className={`dropdown-item ${
+                    sortBy === "nombre" && sortDirection === "desc"
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => handleSelectSort("nombre", "desc")}
+                >
+                  Nombre (Z → A) - Descendente
+                </div>
+                <hr className="dropdown-divider" />
 
-        {/* Lista de proyectos */}
-        <div className="proyectos-linea">
-          {proyectosOrdenados.length === 0 ? (
-            <p className="proyecto-sin-tareas">
-              No hay proyectos finalizados en este departamento.
-            </p>
-          ) : (
-            proyectosOrdenados.map((proyecto) => (
-              <div key={proyecto.id_proyecto} className="proyecto-linea-item completado">
-                <div className="proyecto-nombre">
-                  <span className="proyecto-label">Nombre: </span>
-                  <span className="proyecto-valor">{proyecto.p_nombre}</span>
+                {/* Fecha Inicio */}
+                <div
+                  className={`dropdown-item ${
+                    sortBy === "fechaInicio" && sortDirection === "asc"
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => handleSelectSort("fechaInicio", "asc")}
+                >
+                  Fecha Inicio - Ascendente
+                </div>
+                <div
+                  className={`dropdown-item ${
+                    sortBy === "fechaInicio" && sortDirection === "desc"
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => handleSelectSort("fechaInicio", "desc")}
+                >
+                  Fecha Inicio - Descendente
                 </div>
 
-                <div className="proyecto-columnas">
-                  <div className="proyecto-linea-columna">
-                    <span className="proyecto-label">Fecha inicio:</span>
-                    <span className="proyecto-valor">{proyecto.pf_inicio}</span>
-                  </div>
-                  <div className="proyecto-linea-columna">
-                    <span className="proyecto-label">Fecha fin:</span>
-                    <span className="proyecto-valor">{proyecto.pf_fin}</span>
-                  </div>
-                  <div className="proyecto-linea-columna">
-                    <span className="proyecto-label">Estatus:</span>
-                    <span className="proyecto-valor">{proyecto.p_estatus}</span>
-                  </div>
-                  <div className="proyecto-linea-columna">
-                    <span className="proyecto-label">Responsable:</span>
-                    <span className="proyecto-valor">{proyecto.responsable}</span>
-                  </div>
-                </div>
+                <hr className="dropdown-divider" />
 
-                <div className="proyecto-linea-progreso-container">
-                  <div
-                    className="proyecto-linea-progreso"
-                    onClick={() =>
-                      navigate(`/proyecto/${proyecto.id_proyecto}`, {
-                        state: {
-                          nombreProyecto: proyecto.p_nombre,
-                          descripcionProyecto: proyecto.descripcion,
-                        },
-                      })
-                    }
-                    style={{ cursor: "pointer" }}
-                  >
-                    <ProgresoProyecto
-                      progresoInicial={proyecto.porcentaje}
-                      tareasTotales={proyecto.total_tareas}
-                      tareasCompletadas={proyecto.tareas_completadas}
-                      descripcion={proyecto.descripcion}
-                    />
-                  </div>
+                {/* Fecha Fin */}
+                <div
+                  className={`dropdown-item ${
+                    sortBy === "fechaFin" && sortDirection === "asc" ? "active" : ""
+                  }`}
+                  onClick={() => handleSelectSort("fechaFin", "asc")}
+                >
+                  Fecha Fin - Ascendente
+                </div>
+                <div
+                  className={`dropdown-item ${
+                    sortBy === "fechaFin" && sortDirection === "desc"
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() => handleSelectSort("fechaFin", "desc")}
+                >
+                  Fecha Fin - Descendente
                 </div>
               </div>
-            ))
-          )}
+            )}
+          </div>
         </div>
+      )}
+
+      {/* Lista de proyectos finalizados */}
+      <div className="proyectos-linea">
+        {proyectosOrdenados.length === 0 ? (
+          <p className="proyecto-sin-tareas">
+            No hay proyectos finalizados en este departamento.
+          </p>
+        ) : (
+          proyectosOrdenados.map((proyecto) => (
+            <div
+              key={proyecto.id_proyecto}
+              className="proyecto-linea-item completado"
+            >
+              <div className="proyecto-nombre">
+                <span className="proyecto-label">Nombre: </span>
+                <span className="proyecto-valor">{proyecto.p_nombre}</span>
+              </div>
+
+              <div className="proyecto-columnas">
+                <div className="proyecto-linea-columna">
+                  <span className="proyecto-label">Fecha inicio:</span>
+                  <span className="proyecto-valor">{proyecto.pf_inicio}</span>
+                </div>
+                <div className="proyecto-linea-columna">
+                  <span className="proyecto-label">Fecha fin:</span>
+                  <span className="proyecto-valor">{proyecto.pf_fin}</span>
+                </div>
+                <div className="proyecto-linea-columna">
+                  <span className="proyecto-label">Estatus:</span>
+                  <span className="proyecto-valor">{proyecto.p_estatus}</span>
+                </div>
+                <div className="proyecto-linea-columna">
+                  <span className="proyecto-label">Responsable:</span>
+                  <span className="proyecto-valor">{proyecto.responsable}</span>
+                </div>
+              </div>
+
+              <div className="proyecto-linea-progreso-container">
+                <div
+                  className="proyecto-linea-progreso"
+                  onClick={() =>
+                    navigate(`/proyecto/${proyecto.id_proyecto}`, {
+                      state: {
+                        nombreProyecto: proyecto.p_nombre,
+                        descripcion: proyecto.descripcion,
+                      },
+                    })
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  <ProgresoProyecto
+                    progresoInicial={proyecto.porcentaje}
+                    tareasTotales={proyecto.total_tareas}
+                    tareasCompletadas={proyecto.tareas_completadas}
+                    descripcion={proyecto.descripcion}
+                  />
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
-    </div>
+    </Layout>
   );
 }

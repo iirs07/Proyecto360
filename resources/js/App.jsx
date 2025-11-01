@@ -7,7 +7,7 @@ import RegistroPaso2 from './RegistroPaso2';
 import GenerarInvitacion from './GenerarInvitacion';
 import Login from './Login';
 import ChangePassword from './ChangePassword';
-import DepProSuperUsuario from "./DepProSuperUsuario";
+import DepProProceso from "./DepProProceso";
 import TareasProgreso from './TareasProgreso';
 import DepProCompletados from './DepProCompletados';
 import ReporteSuperUsuario from './ReporteSuperUsuario';
@@ -23,11 +23,10 @@ function App() {
         <Route path="/GenerarInvitacion" element={<GenerarInvitacion />} />
         <Route path="/RegistroPaso1/:token" element={<RegistroPaso1 />} />
         <Route path="/Principal" element={<Principal />} />
-        <Route path="/DepProSuperUsuario/:depId" element={<DepProSuperUsuario />} />
         <Route path="/proyecto/:idProyecto" element={<TareasProgreso />} />
-        <Route path="/proyectoscompletados/:depId" element={<DepProCompletados />} />
         <Route path="/ReporteSuperUsuario" element={<ReporteSuperUsuario />} />
-  
+        <Route path="/proyectosenproceso/:depNombreSlug" element={<DepProProceso />} />
+        <Route path="/proyectoscompletados/:depNombreSlug" element={<DepProCompletados />} />
       </Routes>
     </Router>
   );
